@@ -1,4 +1,7 @@
+// dependencies
 import Vue from "vue";
+
+// local components
 import App from "./App.vue";
 
 Vue.config.productionTip = false;
