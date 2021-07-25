@@ -48,22 +48,29 @@
 
         <div class="my-10 sm:mt-0 flex flex-col justify-center text-center">
           <button
+            @click="toggleConverter"
             class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
           >
-            Cambiar
+            {{
+              
+              fromUsd ? `USD to ${asset.symbol}` : `${asset.symbol} to USD`
+
+            }}
           </button>
 
           <div class="flex flex-row my-5">
             <label class="w-full" for="convertValue">
               <input
+                v-model="convertValue"
                 id="convertValue"
                 type="number"
                 class="text-center bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal"
+                :placeholder="fromUsd ? `Valor en USD` : `Valor en ${asset.symbol}`"
               />
             </label>
           </div>
 
-          <span class="text-xl"></span>
+          <span class="text-xl">{{ convertResult }}</span>
         </div>
       </div>
 
@@ -116,6 +123,8 @@ export default {
       history: [],
       markets: [],
       isLoading: false,
+      fromUsd: true,
+      convertValue: null,
     }
   },
 
@@ -125,13 +134,25 @@ export default {
         ... this.history.map(h => parseFloat(h.priceUsd).toFixed(2))
       )
     },
+
     max() {
       return Math.max(
         ... this.history.map(h => parseFloat(h.priceUsd).toFixed(2))
       )
     },
+
     avg() {
       return this.history.reduce((a, b) => a + parseFloat(b.priceUsd), 0) / this.history.length
+    },
+
+    convertResult() {
+      if(!this.convertValue) {
+        return 0;
+      }
+
+      const result = this.fromUsd ? this.convertValue / this.asset.priceUsd : this.convertValue * this.asset.priceUsd;
+
+      return result.toFixed(2);
     },
   },
 
@@ -146,6 +167,10 @@ export default {
   },
 
   methods: {
+    toggleConverter () {
+      this.fromUsd = !this.fromUsd;
+    },
+
     getWebsite(exchange) {
       this.$set(exchange, 'isLoading', true);
 
